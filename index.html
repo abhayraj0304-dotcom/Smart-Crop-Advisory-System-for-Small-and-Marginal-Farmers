@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>KrishiMitra – Smart Crop Advisory</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+  :root {
+    --green-50:#f0f9f0;--green-100:#c8edc8;--green-300:#6dc06d;--green-500:#2e8b2e;--green-700:#1a5c1a;--green-900:#0c320c;
+    --amber-50:#fef8ed;--amber-100:#fde7b3;--amber-300:#f5c048;--amber-500:#d4860d;--amber-700:#8c5608;
+    --earth:#6b4f35;--earth-light:#c9aa8a;--earth-pale:#f5efe7;
+    --sky:#e8f4fd;--sky-mid:#5aabdf;--sky-dark:#1a6fa0;
+    --white:#ffffff;--offwhite:#fafaf7;--text:#1c2b1c;--text-mid:#4a5e4a;--text-muted:#7a8c7a;
+    --border:#dde8dd;--card-shadow:0 2px 16px rgba(30,60,30,0.07);
+    --radius:16px;--radius-sm:10px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:'DM Sans',sans-serif;background:var(--offwhite);color:var(--text);min-height:100vh;overflow-x:hidden;}
+
+  /* NAV */
+  nav{background:var(--green-700);padding:0 2rem;display:flex;align-items:center;justify-content:space-between;height:64px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,0.18);}
+  .logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+  .logo-icon{width:38px;height:38px;background:var(--amber-300);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px;}
+  .logo-text{font-family:'Playfair Display',serif;font-size:1.3rem;color:#fff;font-weight:700;letter-spacing:-0.3px;}
+  .logo-sub{font-size:0.7rem;color:rgba(255,255,255,0.65);letter-spacing:1px;text-transform:uppercase;display:block;line-height:1;}
+  .nav-links{display:flex;gap:1.5rem;list-style:none;}
+  .nav-links a{color:rgba(255,255,255,0.8);text-decoration:none;font-size:0.9rem;font-weight:500;transition:color 0.2s;}
+  .nav-links a:hover{color:#fff;}
+  .nav-cta{background:var(--amber-300);color:var(--green-900);padding:8px 20px;border-radius:8px;font-weight:600;font-size:0.88rem;border:none;cursor:pointer;transition:background 0.2s;}
+  .nav-cta:hover{background:var(--amber-500);color:#fff;}
+
+  /* HERO */
+  .hero{background:linear-gradient(135deg,var(--green-700) 0%,var(--green-900) 60%);padding:80px 2rem 0;display:flex;align-items:flex-end;justify-content:center;gap:60px;overflow:hidden;min-height:420px;position:relative;}
+  .hero::before{content:'';position:absolute;inset:0;background:url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.03'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");}
+  .hero-text{flex:1;max-width:520px;padding-bottom:60px;z-index:1;}
+  .hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);color:rgba(255,255,255,0.9);padding:6px 14px;border-radius:20px;font-size:0.78rem;font-weight:500;letter-spacing:0.5px;margin-bottom:20px;text-transform:uppercase;}
+  .hero-badge span{width:7px;height:7px;background:var(--amber-300);border-radius:50%;animation:pulse 2s infinite;}
+  @keyframes pulse{0%,100%{transform:scale(1);opacity:1;}50%{transform:scale(1.4);opacity:0.7;}}
+  h1{font-family:'Playfair Display',serif;font-size:clamp(2rem,4vw,3rem);color:#fff;line-height:1.15;font-weight:700;margin-bottom:16px;}
+  h1 em{color:var(--amber-300);font-style:normal;}
+  .hero-desc{color:rgba(255,255,255,0.7);font-size:1rem;line-height:1.7;max-width:420px;margin-bottom:28px;}
+  .hero-actions{display:flex;gap:12px;flex-wrap:wrap;}
+  .btn-primary{background:var(--amber-300);color:var(--green-900);padding:12px 28px;border-radius:10px;font-weight:600;font-size:0.95rem;border:none;cursor:pointer;transition:all 0.2s;text-decoration:none;display:inline-flex;align-items:center;gap:8px;}
+  .btn-primary:hover{background:var(--amber-500);color:#fff;transform:translateY(-1px);}
+  .btn-ghost{background:rgba(255,255,255,0.1);color:#fff;padding:12px 24px;border-radius:10px;font-weight:500;font-size:0.95rem;border:1px solid rgba(255,255,255,0.25);cursor:pointer;transition:all 0.2s;text-decoration:none;}
+  .btn-ghost:hover{background:rgba(255,255,255,0.18);}
+  .hero-visual{flex:0 0 340px;z-index:1;padding-bottom:0;}
+  .hero-card{background:rgba(255,255,255,0.08);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);border-radius:var(--radius) var(--radius) 0 0;padding:24px;width:340px;}
+  .hc-label{font-size:0.75rem;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:1px;margin-bottom:6px;}
+  .hc-crop{font-size:1.5rem;font-weight:600;color:#fff;margin-bottom:16px;}
+  .hc-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  .hc-stat{background:rgba(255,255,255,0.07);border-radius:10px;padding:12px;border:1px solid rgba(255,255,255,0.1);}
+  .hc-stat-val{font-size:1.1rem;font-weight:600;color:var(--amber-300);margin-bottom:2px;}
+  .hc-stat-name{font-size:0.72rem;color:rgba(255,255,255,0.55);}
+  .hc-bar-row{margin-top:12px;display:flex;align-items:center;gap:10px;}
+  .hc-bar{flex:1;height:6px;background:rgba(255,255,255,0.15);border-radius:3px;overflow:hidden;}
+  .hc-bar-fill{height:100%;border-radius:3px;background:var(--green-300);animation:grow 1.5s ease forwards;}
+  @keyframes grow{from{width:0;}to{width:var(--w);}}
+  .hc-bar-label{font-size:0.75rem;color:rgba(255,255,255,0.5);white-space:nowrap;}
+
+  /* STATS BAR */
+  .stats-bar{background:var(--green-500);display:grid;grid-template-columns:repeat(4,1fr);text-align:center;padding:18px 2rem;}
+  .stat-item{border-right:1px solid rgba(255,255,255,0.2);padding:8px 0;}
+  .stat-item:last-child{border-right:none;}
+  .stat-num{font-size:1.6rem;font-weight:700;color:#fff;font-family:'Playfair Display',serif;}
+  .stat-lbl{font-size:0.75rem;color:rgba(255,255,255,0.7);text-transform:uppercase;letter-spacing:0.5px;margin-top:2px;}
+
+  /* MAIN */
+  main{max-width:1200px;margin:0 auto;padding:60px 2rem;}
+  .section-title{font-family:'Playfair Display',serif;font-size:1.85rem;font-weight:700;color:var(--green-700);margin-bottom:8px;}
+  .section-sub{color:var(--text-muted);font-size:0.95rem;line-height:1.6;margin-bottom:36px;}
+
+  /* ADVISORY FORM */
+  .advisory-section{display:grid;grid-template-columns:1fr 1fr;gap:40px;margin-bottom:70px;align-items:start;}
+  .form-card{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:32px;box-shadow:var(--card-shadow);}
+  .form-card h2{font-size:1.2rem;font-weight:600;margin-bottom:6px;color:var(--green-700);}
+  .form-card p{font-size:0.87rem;color:var(--text-muted);margin-bottom:24px;}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+  .form-group{display:flex;flex-direction:column;gap:5px;}
+  .form-group.full{grid-column:1/-1;}
+  label{font-size:0.82rem;font-weight:500;color:var(--text-mid);}
+  select,input[type="text"],input[type="number"]{width:100%;padding:10px 14px;border:1px solid var(--border);border-radius:8px;font-family:'DM Sans',sans-serif;font-size:0.9rem;color:var(--text);background:var(--offwhite);outline:none;transition:border 0.2s;}
+  select:focus,input:focus{border-color:var(--green-500);}
+  .range-group{display:flex;flex-direction:column;gap:5px;}
+  .range-row{display:flex;align-items:center;gap:10px;}
+  input[type="range"]{flex:1;accent-color:var(--green-500);}
+  .range-val{font-weight:600;color:var(--green-500);min-width:40px;text-align:right;font-size:0.9rem;}
+  .submit-btn{width:100%;margin-top:20px;background:var(--green-700);color:#fff;padding:13px;border-radius:10px;border:none;font-size:1rem;font-weight:600;cursor:pointer;transition:all 0.2s;font-family:'DM Sans',sans-serif;display:flex;align-items:center;justify-content:center;gap:8px;}
+  .submit-btn:hover{background:var(--green-500);}
+  .submit-btn .spin{display:none;width:18px;height:18px;border:2px solid rgba(255,255,255,0.3);border-top-color:#fff;border-radius:50%;animation:spin 0.7s linear infinite;}
+  @keyframes spin{to{transform:rotate(360deg);}}
+
+  /* RESULT PANEL */
+  .result-panel{background:var(--white);border-radius:var(--radius);border:1px solid var(--border);padding:32px;box-shadow:var(--card-shadow);min-height:400px;display:flex;flex-direction:column;}
+  .result-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:12px;opacity:0.45;}
+  .result-empty .big-icon{font-size:56px;}
+  .result-empty p{font-size:0.9rem;color:var(--text-muted);}
+  .result-content{display:none;flex-direction:column;gap:0;}
+  .result-header{display:flex;align-items:flex-start;gap:14px;margin-bottom:20px;}
+  .result-icon{width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:26px;background:var(--green-50);border:1px solid var(--green-100);flex-shrink:0;}
+  .result-crop{font-size:1.25rem;font-weight:700;color:var(--green-700);}
+  .result-season{font-size:0.8rem;color:var(--text-muted);margin-top:2px;}
+  .match-bar{margin-bottom:20px;}
+  .match-label{display:flex;justify-content:space-between;font-size:0.82rem;color:var(--text-mid);margin-bottom:6px;}
+  .match-pct{font-weight:600;color:var(--green-500);}
+  .bar-track{height:8px;background:var(--green-50);border-radius:4px;overflow:hidden;border:1px solid var(--green-100);}
+  .bar-fill{height:100%;background:linear-gradient(90deg,var(--green-300),var(--green-500));border-radius:4px;transition:width 1s ease;}
+  .advice-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+  .advice-chip{background:var(--green-50);border:1px solid var(--green-100);border-radius:8px;padding:10px 12px;}
+  .advice-chip-label{font-size:0.72rem;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:3px;}
+  .advice-chip-val{font-size:0.9rem;font-weight:600;color:var(--green-700);}
+  .advice-section{background:var(--earth-pale);border-radius:10px;padding:14px 16px;margin-bottom:12px;}
+  .advice-section h4{font-size:0.85rem;font-weight:600;color:var(--earth);margin-bottom:6px;display:flex;align-items:center;gap:6px;}
+  .advice-section ul{list-style:none;display:flex;flex-direction:column;gap:4px;}
+  .advice-section li{font-size:0.84rem;color:var(--text-mid);display:flex;align-items:flex-start;gap:6px;}
+  .advice-section li::before{content:'→';color:var(--green-500);flex-shrink:0;margin-top:1px;}
+  .warning-box{background:#fff8e6;border:1px solid #f5c048;border-radius:8px;padding:12px 14px;font-size:0.83rem;color:#7a5b0a;display:flex;gap:8px;align-items:flex-start;}
+  .alt-crops{margin-top:8px;}
+  .alt-crops h4{font-size:0.82rem;font-weight:500;color:var(--text-mid);margin-bottom:8px;}
+  .alt-chips{display:flex;gap:8px;flex-wrap:wrap;}
+  .alt-chip{background:var(--offwhite);border:1px solid var(--border);border-radius:20px;padding:5px 12px;font-size:0.8rem;font-weight:500;color:var(--green-700);cursor:pointer;transition:all 0.15s;}
+  .alt-chip:hover{background:var(--green-50);border-color:var(--green-300);}
+
+  /* CROP GRID */
+  .crops-section{margin-bottom:70px;}
+  .crop-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:18px;}
+  .crop-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;cursor:pointer;transition:all 0.2s;box-shadow:var(--card-shadow);}
+  .crop-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(30,80,30,0.12);border-color:var(--green-300);}
+  .crop-thumb{height:100px;display:flex;align-items:center;justify-content:center;font-size:52px;position:relative;overflow:hidden;}
+  .crop-thumb::after{content:'';position:absolute;inset:0;background:linear-gradient(to bottom,transparent 50%,rgba(0,0,0,0.04));}
+  .crop-body{padding:14px;}
+  .crop-name{font-weight:600;font-size:0.95rem;margin-bottom:3px;color:var(--text);}
+  .crop-season{font-size:0.75rem;color:var(--text-muted);margin-bottom:8px;}
+  .crop-tags{display:flex;gap:5px;flex-wrap:wrap;}
+  .tag{font-size:0.7rem;padding:3px 8px;border-radius:10px;font-weight:500;}
+  .tag-green{background:var(--green-50);color:var(--green-700);border:1px solid var(--green-100);}
+  .tag-amber{background:var(--amber-50);color:var(--amber-700);border:1px solid var(--amber-100);}
+  .tag-blue{background:var(--sky);color:var(--sky-dark);}
+
+  /* WEATHER STRIP */
+  .weather-strip{background:linear-gradient(135deg,var(--sky-dark),#0d4a7a);border-radius:var(--radius);padding:28px 32px;margin-bottom:70px;display:grid;grid-template-columns:auto 1fr repeat(4,auto);gap:20px;align-items:center;}
+  .weather-loc{color:rgba(255,255,255,0.6);font-size:0.8rem;text-transform:uppercase;letter-spacing:0.5px;grid-column:1/-1;margin-bottom:-8px;}
+  .weather-temp{font-size:3rem;font-weight:700;color:#fff;font-family:'Playfair Display',serif;line-height:1;}
+  .weather-desc{color:rgba(255,255,255,0.8);font-size:0.9rem;margin-top:4px;}
+  .weather-sep{width:1px;background:rgba(255,255,255,0.2);height:50px;}
+  .weather-stat{text-align:center;}
+  .weather-stat-val{font-size:1.1rem;font-weight:600;color:#fff;}
+  .weather-stat-lbl{font-size:0.72rem;color:rgba(255,255,255,0.55);text-transform:uppercase;letter-spacing:0.4px;margin-top:3px;}
+  .weather-icon-big{font-size:3rem;grid-row:2/3;}
+
+  /* SCHEME CARDS */
+  .schemes-section{margin-bottom:70px;}
+  .scheme-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px;}
+  .scheme-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:22px;box-shadow:var(--card-shadow);display:flex;gap:14px;}
+  .scheme-icon{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0;}
+  .scheme-body h3{font-size:0.95rem;font-weight:600;margin-bottom:5px;color:var(--text);}
+  .scheme-body p{font-size:0.82rem;color:var(--text-muted);line-height:1.5;margin-bottom:10px;}
+  .scheme-link{font-size:0.8rem;color:var(--green-500);font-weight:600;text-decoration:none;display:inline-flex;align-items:center;gap:4px;}
+  .scheme-link:hover{color:var(--green-700);}
+
+  /* MARKET */
+  .market-section{margin-bottom:70px;}
+  .market-table{width:100%;border-collapse:collapse;background:var(--white);border-radius:var(--radius);overflow:hidden;box-shadow:var(--card-shadow);border:1px solid var(--border);}
+  .market-table thead{background:var(--green-700);}
+  .market-table th{color:#fff;font-size:0.8rem;text-transform:uppercase;letter-spacing:0.5px;padding:13px 18px;text-align:left;font-weight:500;}
+  .market-table td{padding:13px 18px;font-size:0.88rem;border-bottom:1px solid var(--border);color:var(--text);}
+  .market-table tbody tr:last-child td{border-bottom:none;}
+  .market-table tbody tr:hover td{background:var(--green-50);}
+  .price-up{color:#1d8a4b;font-weight:600;}
+  .price-down{color:#c0392b;font-weight:600;}
+  .price-neu{color:var(--text-muted);font-weight:500;}
+
+  /* FOOTER */
+  footer{background:var(--green-900);color:rgba(255,255,255,0.65);text-align:center;padding:28px 2rem;font-size:0.82rem;}
+  footer strong{color:rgba(255,255,255,0.9);}
+
+  /* RESPONSIVE */
+  @media(max-width:900px){
+    .hero{flex-direction:column;padding:50px 1.5rem 0;gap:30px;min-height:unset;}
+    .hero-visual{width:100%;padding-bottom:0;}
+    .hero-card{width:100%;}
+    .advisory-section{grid-template-columns:1fr;}
+    .stats-bar{grid-template-columns:1fr 1fr;}
+    .weather-strip{grid-template-columns:auto 1fr 1fr 1fr;row-gap:10px;}
+    .weather-sep{display:none;}
+    nav{padding:0 1rem;}
+    .nav-links{display:none;}
+  }
+  @media(max-width:600px){
+    .stats-bar{grid-template-columns:1fr 1fr;}
+    .form-grid{grid-template-columns:1fr;}
+    .advice-grid{grid-template-columns:1fr;}
+    .crop-grid{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <a class="logo" href="#">
+    <div class="logo-icon">🌾</div>
+    <div>
+      <span class="logo-text">KrishiMitra</span>
+      <span class="logo-sub">Smart Crop Advisory</span>
+    </div>
+  </a>
+  <ul class="nav-links">
+    <li><a href="#advisory">Advisory</a></li>
+    <li><a href="#crops">Crops</a></li>
+    <li><a href="#market">Market</a></li>
+    <li><a href="#schemes">Schemes</a></li>
+  </ul>
+  <button class="nav-cta">📞 Helpline: 1800-180-1551</button>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-text">
+    <div class="hero-badge"><span></span>AI-Powered · Free for Farmers</div>
+    <h1>Smart Advice for <em>Better Harvests</em></h1>
+    <p class="hero-desc">Get personalised crop recommendations, weather alerts, and government scheme guidance — in your language, for your land.</p>
+    <div class="hero-actions">
+      <a class="btn-primary" href="#advisory">🌱 Get Crop Advice</a>
+      <a class="btn-ghost" href="#market">📊 Today's Prices</a>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-card">
+      <div class="hc-label">Live Recommendation</div>
+      <div class="hc-crop">🌾 Wheat — Rabi Season</div>
+      <div class="hc-stats">
+        <div class="hc-stat"><div class="hc-stat-val">87%</div><div class="hc-stat-name">Soil Match</div></div>
+        <div class="hc-stat"><div class="hc-stat-val">₹2,275</div><div class="hc-stat-name">MSP/Qtl</div></div>
+        <div class="hc-stat"><div class="hc-stat-val">120 days</div><div class="hc-stat-name">Duration</div></div>
+        <div class="hc-stat"><div class="hc-stat-val">22–30 mm</div><div class="hc-stat-name">Water/Week</div></div>
+      </div>
+      <div style="margin-top:14px;font-size:0.75rem;color:rgba(255,255,255,0.5);margin-bottom:6px;">Suitability Score</div>
+      <div class="hc-bar-row"><div class="hc-bar"><div class="hc-bar-fill" style="--w:87%;"></div></div><div class="hc-bar-label" style="color:rgba(255,255,255,0.7);">87 / 100</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- STATS -->
+<div class="stats-bar">
+  <div class="stat-item"><div class="stat-num">2.4L+</div><div class="stat-lbl">Farmers Helped</div></div>
+  <div class="stat-item"><div class="stat-num">120+</div><div class="stat-lbl">Crops Covered</div></div>
+  <div class="stat-item"><div class="stat-num">28</div><div class="stat-lbl">States & UTs</div></div>
+  <div class="stat-item"><div class="stat-num">₹8.2Cr</div><div class="stat-lbl">Savings Generated</div></div>
+</div>
+
+<main>
+
+  <!-- WEATHER -->
+  <div class="weather-strip">
+    <div class="weather-loc">📍 Durg, Chhattisgarh — Farming Zone B</div>
+    <div style="font-size:3rem;grid-row:2">⛅</div>
+    <div style="grid-row:2">
+      <div class="weather-temp" id="wtemp">34°C</div>
+      <div class="weather-desc">Partly Cloudy · Good for sowing</div>
+    </div>
+    <div class="weather-sep"></div>
+    <div class="weather-stat"><div class="weather-stat-val">68%</div><div class="weather-stat-lbl">Humidity</div></div>
+    <div class="weather-stat"><div class="weather-stat-val">18 km/h</div><div class="weather-stat-lbl">Wind</div></div>
+    <div class="weather-stat"><div class="weather-stat-val">12 mm</div><div class="weather-stat-lbl">Rain (7d)</div></div>
+    <div class="weather-stat"><div class="weather-stat-val">6.8</div><div class="weather-stat-lbl">Soil pH</div></div>
+  </div>
+
+  <!-- ADVISORY -->
+  <section id="advisory" style="margin-bottom:0;">
+    <div class="section-title">🌿 Crop Advisory Engine</div>
+    <p class="section-sub">Enter your farm details and get AI-powered recommendations instantly — no internet needed after setup.</p>
+    <div class="advisory-section">
+      <!-- FORM -->
+      <div class="form-card">
+        <h2>Your Farm Profile</h2>
+        <p>Fill in the details below for personalised advice</p>
+        <div class="form-grid">
+          <div class="form-group">
+            <label>State</label>
+            <select id="f-state">
+              <option value="">-- Select State --</option>
+              <option selected>Chhattisgarh</option>
+              <option>Madhya Pradesh</option>
+              <option>Maharashtra</option>
+              <option>Punjab</option>
+              <option>Uttar Pradesh</option>
+              <option>Bihar</option>
+              <option>Rajasthan</option>
+              <option>Gujarat</option>
+              <option>Odisha</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>District</label>
+            <select id="f-district">
+              <option>Durg</option>
+              <option>Raipur</option>
+              <option>Bilaspur</option>
+              <option>Korba</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Season</label>
+            <select id="f-season">
+              <option>Kharif (Jun–Oct)</option>
+              <option>Rabi (Nov–Mar)</option>
+              <option>Zaid (Mar–Jun)</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Soil Type</label>
+            <select id="f-soil">
+              <option>Black Cotton Soil</option>
+              <option>Red Loamy Soil</option>
+              <option>Sandy Loam</option>
+              <option>Alluvial Soil</option>
+              <option>Laterite Soil</option>
+            </select>
+          </div>
+          <div class="form-group full range-group">
+            <label>Land Area (acres): <span id="area-val" style="color:var(--green-500);font-weight:600;">2</span></label>
+            <div class="range-row">
+              <input type="range" min="0.25" max="10" step="0.25" value="2" id="f-area" oninput="document.getElementById('area-val').textContent=this.value"/>
+            </div>
+          </div>
+          <div class="form-group full range-group">
+            <label>Water Availability: <span id="water-val" style="color:var(--green-500);font-weight:600;">Moderate</span></label>
+            <div class="range-row">
+              <input type="range" min="1" max="3" step="1" value="2" id="f-water" oninput="setWater(this.value)"/>
+            </div>
+          </div>
+          <div class="form-group">
+            <label>Primary Goal</label>
+            <select id="f-goal">
+              <option>Maximum Yield</option>
+              <option>High Market Price</option>
+              <option>Low Input Cost</option>
+              <option>Drought Resistant</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Budget (₹/acre)</label>
+            <select id="f-budget">
+              <option>Below ₹5,000</option>
+              <option selected>₹5,000 – ₹15,000</option>
+              <option>₹15,000 – ₹30,000</option>
+              <option>Above ₹30,000</option>
+            </select>
+          </div>
+        </div>
+        <button class="submit-btn" id="advisory-btn" onclick="getAdvice()">
+          <span class="spin" id="spin"></span>
+          <span id="btn-text">🔍 Get Recommendations</span>
+        </button>
+      </div>
+
+      <!-- RESULT -->
+      <div class="result-panel" id="result-panel">
+        <div class="result-empty" id="result-empty">
+          <div class="big-icon">🌱</div>
+          <p>Fill in your farm details<br/>and click <strong>Get Recommendations</strong></p>
+        </div>
+        <div class="result-content" id="result-content"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- POPULAR CROPS -->
+  <section id="crops" class="crops-section">
+    <div class="section-title">🌾 Popular Crops for Your Region</div>
+    <p class="section-sub">Tap any crop card for detailed sowing, fertiliser, and pest management guidance.</p>
+    <div class="crop-grid" id="crop-grid"></div>
+  </section>
+
+  <!-- MARKET PRICES -->
+  <section id="market" class="market-section">
+    <div class="section-title">📊 Today's Mandi Prices</div>
+    <p class="section-sub">Live market rates from nearby APMCs. MSP prices as declared by Government of India for 2024–25.</p>
+    <table class="market-table">
+      <thead>
+        <tr>
+          <th>Crop</th>
+          <th>Market</th>
+          <th>Price (₹/Qtl)</th>
+          <th>MSP (₹/Qtl)</th>
+          <th>vs Yesterday</th>
+          <th>Season</th>
+        </tr>
+      </thead>
+      <tbody id="market-body"></tbody>
+    </table>
+  </section>
+
+  <!-- GOVERNMENT SCHEMES -->
+  <section id="schemes" class="schemes-section">
+    <div class="section-title">🏛️ Government Schemes for You</div>
+    <p class="section-sub">Subsidies and support programmes available for small and marginal farmers.</p>
+    <div class="scheme-grid" id="scheme-grid"></div>
+  </section>
+
+</main>
+
+<footer>
+  <strong>KrishiMitra</strong> — Smart Crop Advisory System for Small &amp; Marginal Farmers &nbsp;|&nbsp;
+  Helpline: <strong>1800-180-1551</strong> (Free, 8AM–8PM) &nbsp;|&nbsp;
+  Data sourced from ICAR, IMD &amp; eNAM &nbsp;|&nbsp;
+  © 2025 Ministry of Agriculture &amp; Farmers Welfare
+</footer>
+
+<script>
+const waterLabels=['','Limited','Moderate','Abundant'];
+function setWater(v){document.getElementById('water-val').textContent=waterLabels[v];}
+
+const CROPS=[
+  {e:'🌾',n:'Wheat',s:'Rabi',bg:'#f5f0e0',soil:'Alluvial / Clay Loam',water:'Low–Med',days:120,msp:2275,tags:['High MSP','Rabi','Easy Care']},
+  {e:'🌽',n:'Maize',s:'Kharif / Zaid',bg:'#f5f9e0',soil:'Sandy Loam',water:'Moderate',days:85,msp:2090,tags:['Quick Yield','Versatile']},
+  {e:'🌻',n:'Soybean',s:'Kharif',bg:'#fffff0',soil:'Black Cotton',water:'Low',days:95,msp:4892,tags:['High Value','Nitrogen Fix']},
+  {e:'🥜',n:'Groundnut',s:'Kharif / Rabi',bg:'#fdf5e0',soil:'Sandy Loam',water:'Low',days:110,msp:6783,tags:['Drought Resist']},
+  {e:'🌿',n:'Tur (Arhar)',s:'Kharif',bg:'#f0f9f0',soil:'Red / Black',water:'Low',days:160,msp:7550,tags:['High MSP','Protein']},
+  {e:'🌾',n:'Paddy (Rice)',s:'Kharif',bg:'#eaf7ea',soil:'Clay / Alluvial',water:'High',days:130,msp:2300,tags:['Staple Crop']},
+  {e:'🧅',n:'Onion',s:'Rabi / Kharif',bg:'#fff0f5',soil:'Well-drained Loam',water:'Moderate',days:90,msp:'Market',tags:['Cash Crop','High Demand']},
+  {e:'🍅',n:'Tomato',s:'Year-round',bg:'#fff0ee',soil:'Sandy Loam',water:'Moderate',days:70,msp:'Market',tags:['High Value','Cash Crop']},
+  {e:'🟡',n:'Chana (Gram)',s:'Rabi',bg:'#fefaeb',soil:'Sandy Clay Loam',water:'Low',days:100,msp:5440,tags:['Drought Resist','Protein']},
+  {e:'🌱',n:'Mustard',s:'Rabi',bg:'#fffff0',soil:'Loamy / Sandy',water:'Low',days:110,msp:5650,tags:['Low Input','Oil Seed']},
+];
+
+const tagColors={
+  'High MSP':'tag-green','Rabi':'tag-blue','Quick Yield':'tag-green','Versatile':'tag-amber',
+  'High Value':'tag-amber','Nitrogen Fix':'tag-green','Drought Resist':'tag-amber',
+  'Protein':'tag-green','Staple Crop':'tag-blue','Cash Crop':'tag-amber',
+  'High Demand':'tag-amber','Easy Care':'tag-green','Low Input':'tag-green',
+  'Oil Seed':'tag-amber','Kharif':'tag-blue','Year-round':'tag-blue'
+};
+
+function buildCrops(){
+  const g=document.getElementById('crop-grid');
+  g.innerHTML=CROPS.map(c=>`
+    <div class="crop-card" onclick="selectCrop('${c.n}')">
+      <div class="crop-thumb" style="background:${c.bg}">${c.e}</div>
+      <div class="crop-body">
+        <div class="crop-name">${c.n}</div>
+        <div class="crop-season">${c.s} · ${c.days} days</div>
+        <div class="crop-tags">${c.tags.map(t=>`<span class="tag ${tagColors[t]||'tag-blue'}">${t}</span>`).join('')}</div>
+      </div>
+    </div>`).join('');
+}
+
+const MARKET=[
+  {crop:'Wheat 🌾',mkt:'Durg APMC',price:2310,msp:2275,chg:+35,s:'Rabi'},
+  {crop:'Maize 🌽',mkt:'Raipur APMC',price:2050,msp:2090,chg:-40,s:'Kharif'},
+  {crop:'Soybean 🌻',mkt:'Bilaspur APMC',price:4980,msp:4892,chg:+88,s:'Kharif'},
+  {crop:'Tur Dal 🌿',mkt:'Durg APMC',price:7620,msp:7550,chg:+70,s:'Kharif'},
+  {crop:'Groundnut 🥜',mkt:'Rajnandgaon',price:6700,msp:6783,chg:-83,s:'Kharif'},
+  {crop:'Chana 🟡',mkt:'Raipur APMC',price:5480,msp:5440,chg:+40,s:'Rabi'},
+  {crop:'Mustard 🌱',mkt:'Durg APMC',price:5720,msp:5650,chg:+70,s:'Rabi'},
+  {crop:'Paddy 🌾',mkt:'Bilaspur APMC',price:2280,msp:2300,chg:-20,s:'Kharif'},
+];
+
+function buildMarket(){
+  const b=document.getElementById('market-body');
+  b.innerHTML=MARKET.map(r=>{
+    const cls=r.chg>0?'price-up':r.chg<0?'price-down':'price-neu';
+    const arrow=r.chg>0?'↑':r.chg<0?'↓':'→';
+    return`<tr>
+      <td><strong>${r.crop}</strong></td>
+      <td>${r.mkt}</td>
+      <td>₹${r.price.toLocaleString()}</td>
+      <td>₹${typeof r.msp==='number'?r.msp.toLocaleString():r.msp}</td>
+      <td class="${cls}">${arrow} ₹${Math.abs(r.chg)}</td>
+      <td><span class="tag ${r.s==='Rabi'?'tag-blue':'tag-green'}">${r.s}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+const SCHEMES=[
+  {i:'💰',bg:'#e8f5e9',n:'PM-KISAN',d:'₹6,000/year direct income support in 3 instalments to all small and marginal farmers.',url:'https://pmkisan.gov.in'},
+  {i:'🛡️',bg:'#fff3e0',n:'PM Fasal Bima Yojana',d:'Crop insurance at very low premium — protect your harvest from natural calamities.',url:'https://pmfby.gov.in'},
+  {i:'💧',bg:'#e3f2fd',n:'PM Krishi Sinchayee Yojana',d:'Subsidies for irrigation infrastructure and water conservation on farms.',url:'#'},
+  {i:'🏦',bg:'#f3e5f5',n:'Kisan Credit Card',d:'Easy credit at 4–7% interest for agricultural needs, inputs, and equipment.',url:'#'},
+  {i:'🌱',bg:'#e8f5e9',n:'Soil Health Card Scheme',d:'Free soil testing and crop-specific nutrient recommendations every 2 years.',url:'#'},
+  {i:'🚜',bg:'#fff8e1',n:'Sub-Mission on Agri Mechanisation',d:'50–80% subsidy on farm equipment for SC/ST and small farmer categories.',url:'#'},
+];
+
+function buildSchemes(){
+  const g=document.getElementById('scheme-grid');
+  g.innerHTML=SCHEMES.map(s=>`
+    <div class="scheme-card">
+      <div class="scheme-icon" style="background:${s.bg};font-size:22px">${s.i}</div>
+      <div class="scheme-body">
+        <h3>${s.n}</h3>
+        <p>${s.d}</p>
+        <a class="scheme-link" href="${s.url}" target="_blank">Learn more →</a>
+      </div>
+    </div>`).join('');
+}
+
+function selectCrop(name){
+  const c=CROPS.find(x=>x.n===name);if(!c)return;
+  document.getElementById('f-soil').value=c.soil.split('/')[0].trim();
+  document.getElementById('f-season').selectedIndex=c.s.includes('Kharif')?0:c.s.includes('Rabi')?1:2;
+  document.getElementById('advisory-btn').click();
+}
+
+const ADVICE_DB={
+  'Kharif (Jun–Oct)':{
+    'Black Cotton Soil':{crop:'Soybean',e:'🌻',score:91,alt:['Cotton','Tur Dal','Maize'],days:95,water:'25–30 mm/week',fert:'DAP 100kg + MOP 50kg/acre',tips:['Sow after first good rain (June 15–30)','Use certified HMT/JS-335 seeds','Do not irrigate until 3rd week after germination'],pest:'Watch for whitefly and pod borer. Spray Chlorpyrifos 2ml/L at bud stage.'},
+    'Red Loamy Soil':{crop:'Tur (Arhar)',e:'🌿',score:85,alt:['Groundnut','Maize','Sesame'],days:160,water:'15–20 mm/week',fert:'SSP 80kg + Urea 25kg/acre (split)',tips:['Intercrop with Jowar for extra income','Thin to 1 plant per hole at 2 weeks','Apply Rhizobium inoculant before sowing'],pest:'Spray Imidacloprid 0.5ml/L for pod borers at flowering.'},
+    'Sandy Loam':{crop:'Maize',e:'🌽',score:88,alt:['Groundnut','Sunflower'],days:85,water:'30 mm/week',fert:'Urea 100kg + DAP 50kg/acre in 3 splits',tips:['Sow at 60×25 cm spacing','Top dress Urea at knee-high stage','Ensure good drainage to prevent root rot'],pest:'Treat seeds with Thiram before sowing. Apply Carbaryl for fall armyworm.'},
+    'Alluvial Soil':{crop:'Paddy (Rice)',e:'🌾',score:93,alt:['Maize','Jute'],days:130,water:'Maintain 5 cm standing water',fert:'Urea 120kg + DAP 60kg/acre',tips:['Transplant 25-day old seedlings','Maintain water level during flowering','Drain field 10 days before harvest'],pest:'Spray Monocrotophos for stem borer. Use pheromone traps.'},
+    'Laterite Soil':{crop:'Groundnut',e:'🥜',score:82,alt:['Sesame','Cowpea'],days:110,water:'20–25 mm/week',fert:'Gypsum 200 kg/acre at pegging',tips:['Ensure well-drained field','Apply lime if pH < 5.5','Harvest when leaves turn yellow'],pest:'Monitor for tikka disease. Spray Mancozeb 2.5g/L.'},
+  },
+  'Rabi (Nov–Mar)':{
+    'Black Cotton Soil':{crop:'Wheat',e:'🌾',score:87,alt:['Chickpea','Mustard'],days:120,water:'6 irrigations from sowing to grain fill',fert:'Urea 120kg + DAP 60kg/acre in 2 splits',tips:['Sow between Nov 15–Dec 1 for best yield','Use HD-2781 or GW-322 variety','Irrigate at crown root stage (CRI)'],pest:'Watch for rust. Apply Propiconazole 1ml/L at flag leaf stage.'},
+    'Sandy Loam':{crop:'Mustard',e:'🌱',score:90,alt:['Barley','Linseed'],days:110,water:'2–3 irrigations total',fert:'Urea 60kg + SSP 100kg/acre',tips:['Thin to 15–20 cm spacing at 10 days','Apply sulfur for better oil content','Harvest when 75% siliqua turn golden'],pest:'Apply Oxydemeton-methyl for aphids at 50+ aphids/plant.'},
+    'Alluvial Soil':{crop:'Wheat',e:'🌾',score:92,alt:['Potato','Peas','Mustard'],days:115,water:'5–6 irrigations',fert:'Urea 130kg + DAP 65kg/acre',tips:['Use K0307 / HD-3086 for high yield','Apply zinc sulphate 25 kg/acre if deficient','Avoid excess irrigation to prevent lodging'],pest:'Monitor for yellow rust from January. Spray Propiconazole.'},
+    'Red Loamy Soil':{crop:'Chickpea (Chana)',e:'🟡',score:86,alt:['Linseed','Safflower'],days:100,water:'1–2 irrigations only',fert:'DAP 40kg + MOP 20kg/acre (basal only)',tips:['Sow with seed drill at 10 cm spacing','Do not irrigate before pod fill stage','Apply Rhizobium culture for better nodulation'],pest:'Spray Chlorpyrifos for pod borer at bud stage.'},
+    'Black Cotton Soil':{crop:'Chickpea (Chana)',e:'🟡',score:89,alt:['Wheat','Mustard'],days:100,water:'Minimal — 1 pre-sowing irrigation',fert:'SSP 60kg + Urea 20kg/acre',tips:['Good drainage is essential','Avoid waterlogging at any stage','Use JG-11 or JAKI-9218 variety'],pest:'Use HaNPV spray for Helicoverpa pest control.'},
+    'Laterite Soil':{crop:'Mustard',e:'🌱',score:80,alt:['Gram','Linseed'],days:100,water:'2 irrigations',fert:'Urea 50kg + SSP 80kg/acre',tips:['Ensure field is free of weeds at sowing','Apply boron 1 kg/acre for pod setting','Harvest in cool morning hours'],pest:'Apply Neem oil 5ml/L for early season pest control.'},
+    'Sandy Loam':{crop:'Mustard',e:'🌱',score:83,alt:['Gram','Wheat'],days:105,water:'2–3 irrigations',fert:'Urea 60kg + DAP 40kg/acre',tips:['Do not delay sowing beyond Nov 15','Intercrop with coriander for extra income','Weed control at 20–25 days is critical'],pest:'Monitor aphids from December. Spray Dimethoate 2ml/L.'},
+  },
+  'Zaid (Mar–Jun)':{
+    'Sandy Loam':{crop:'Maize',e:'🌽',score:84,alt:['Moong','Watermelon'],days:80,water:'High — irrigate every 5–6 days',fert:'Urea 80kg + DAP 40kg/acre',tips:['Choose heat tolerant variety','Mulch to conserve soil moisture','Harvest early morning to maintain quality'],pest:'Apply Carbaryl for fall armyworm. Use light traps.'},
+    'Alluvial Soil':{crop:'Moong (Green Gram)',e:'🌱',score:88,alt:['Cucumber','Bitter Gourd'],days:65,water:'Irrigation every 7 days',fert:'DAP 20kg/acre (basal) only',tips:['Sow in March after Rabi harvest','Quick crop — vacates field by June','Fixes nitrogen for next season crop'],pest:'Spray Monocrotophos for yellow mosaic virus vector.'},
+    'Black Cotton Soil':{crop:'Watermelon',e:'🍉',score:82,alt:['Muskmelon','Groundnut'],days:80,water:'Drip irrigation preferred',fert:'FYM 5t + NPK 60:30:30 kg/acre',tips:['Train 2 vines per plant','Pollinate manually for good fruit set','Harvest when stem near fruit dries'],pest:'Use yellow sticky traps for whitefly management.'},
+    'Red Loamy Soil':{crop:'Sesame',e:'🌾',score:79,alt:['Maize','Cowpea'],days:75,water:'2–3 irrigations',fert:'Urea 40kg + SSP 60kg/acre',tips:['Avoid standing water','Harvest at capsule split stage','Good oil crop for summer'],pest:'Minimal pest pressure — apply Neem oil if needed.'},
+    'Laterite Soil':{crop:'Cowpea',e:'🌿',score:81,alt:['Sesame','Maize'],days:70,water:'Weekly irrigation',fert:'DAP 25kg/acre',tips:['Dual purpose — grain and fodder','Shade tolerant — good in orchards','Quick to establish'],pest:'Watch for aphids. Spray Dimethoate at first sign.'},
+  },
+};
+
+function getAdvice(){
+  const btn=document.getElementById('advisory-btn');
+  const spin=document.getElementById('spin');
+  const txt=document.getElementById('btn-text');
+  btn.disabled=true;spin.style.display='inline-block';txt.textContent='Analysing...';
+
+  setTimeout(()=>{
+    btn.disabled=false;spin.style.display='none';txt.textContent='🔍 Get Recommendations';
+
+    const season=document.getElementById('f-season').value;
+    const soil=document.getElementById('f-soil').value;
+    const goal=document.getElementById('f-goal').value;
+    const budget=document.getElementById('f-budget').value;
+    const area=document.getElementById('f-area').value;
+
+    const sData=ADVICE_DB[season]||ADVICE_DB['Kharif (Jun–Oct)'];
+    let match=sData[soil];
+    if(!match){const keys=Object.keys(sData);match=sData[keys[Math.floor(Math.random()*keys.length)]];}
+
+    const score=match.score;
+    const msp=MARKET.find(m=>m.crop.includes(match.crop));
+    const priceStr=msp?`₹${msp.price.toLocaleString()}/Qtl`:'Market Price';
+
+    document.getElementById('result-empty').style.display='none';
+    const rc=document.getElementById('result-content');
+    rc.style.display='flex';
+
+    const warning=budget==='Below ₹5,000'?`<div class="warning-box">⚠️ <span>Your budget is tight. Choose <strong>${match.alt[0]||'low-input crops'}</strong> with government seed subsidy to reduce input cost.</span></div>`:'';
+
+    rc.innerHTML=`
+      <div class="result-header">
+        <div class="result-icon" style="font-size:26px">${match.e}</div>
+        <div>
+          <div class="result-crop">Recommended: ${match.crop}</div>
+          <div class="result-season">${season} · ${soil} · ${area} acres</div>
+        </div>
+      </div>
+      <div class="match-bar">
+        <div class="match-label"><span>Suitability Score</span><span class="match-pct">${score}%</span></div>
+        <div class="bar-track"><div class="bar-fill" style="width:0%" id="bfill"></div></div>
+      </div>
+      <div class="advice-grid">
+        <div class="advice-chip"><div class="advice-chip-label">Duration</div><div class="advice-chip-val">${match.days} days</div></div>
+        <div class="advice-chip"><div class="advice-chip-label">Water Needed</div><div class="advice-chip-val">${match.water}</div></div>
+        <div class="advice-chip"><div class="advice-chip-label">Market Price</div><div class="advice-chip-val">${priceStr}</div></div>
+        <div class="advice-chip"><div class="advice-chip-label">Expected Return</div><div class="advice-chip-val">₹${(score*180).toLocaleString()}/acre</div></div>
+      </div>
+      <div class="advice-section">
+        <h4>🌱 Fertiliser Recommendation</h4>
+        <ul><li>${match.fert}</li><li>Apply organic manure (FYM) 2–3 tons/acre as base dressing</li><li>Soil test every 2 years — avail free Soil Health Card</li></ul>
+      </div>
+      <div class="advice-section">
+        <h4>📋 Cultivation Tips</h4>
+        <ul>${match.tips.map(t=>`<li>${t}</li>`).join('')}</ul>
+      </div>
+      <div class="advice-section">
+        <h4>🐛 Pest & Disease Alert</h4>
+        <ul><li>${match.pest}</li><li>Keep field inspections every 7 days from germination</li></ul>
+      </div>
+      ${warning}
+      <div class="alt-crops">
+        <h4>🔄 Alternative Crops to Consider</h4>
+        <div class="alt-chips">${match.alt.map(a=>`<span class="alt-chip" onclick="selectCrop('${a}')">${a}</span>`).join('')}</div>
+      </div>`;
+
+    setTimeout(()=>{
+      document.getElementById('bfill').style.width=score+'%';
+    },50);
+  },1400);
+}
+
+buildCrops();buildMarket();buildSchemes();
+</script>
+</body>
+</html>
